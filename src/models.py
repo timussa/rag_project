@@ -12,3 +12,8 @@ create(
     system=SYSTEM_PROMPT,
     stream=True,
 )
+
+create(
+    model='qwen-embedding',
+    from_='qwen3-embedding'
+)

@@ -1,4 +1,4 @@
-from ollama import chat, ChatResponse, create
+from ollama import chat, ChatResponse, embed
 
 def start_chat():
 
@@ -13,7 +13,8 @@ def start_chat():
             messages=history,
         )
         history.append({'role': 'ai', 'content': response.message.content})
-        print(response.message.content)
+        # print(response.message.content)
+
 
 
 if __name__ == '__main__':

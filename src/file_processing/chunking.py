@@ -37,5 +37,5 @@ def chunk_directory(dir: str, chunk_size: int = 300):
 
 	return result
 
-if __name__ == '__main__':
-	qa_chunk_processing("C:/Users/PC/Desktop/dataset/Настолки.txt")
+# if __name__ == '__main__':
+# 	qa_chunk_processing("")
