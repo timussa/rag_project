@@ -1,5 +1,3 @@
-import os
-
 
 def simple_checking(line: str):
 	if "Вопрос" in line and "Ответ" in line:
@@ -27,15 +25,3 @@ def qa_chunk_processing(file_path: str, chunk_size: int = 300):
 
 	return lines
 
-
-def chunk_directory(dir: str, chunk_size: int = 300):
-	result = []
-	for root, ders, files in os.walk(dir):
-		for file in files:
-			file_path = os.path.join(root, file)
-			result.append(qa_chunk_processing(file_path, chunk_size))
-
-	return result
-
-# if __name__ == '__main__':
-# 	qa_chunk_processing("")

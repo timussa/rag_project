@@ -1,27 +1,52 @@
+import os
 import chromadb
-from typing import List
-from src.file_processing.chunking import qa_chunk_processing, chunk_directory
+from src.file_processing.chunking import qa_chunk_processing
 from src.file_processing.embeddings import chunks_to_vectors
+import time
 
 
-chroma_client = chromadb.Client()
+chroma_client = chromadb.PersistentClient(path="./chroma_db")
 
-vector_db = chroma_client.create_collection(name="vector_db")
+vector_db = chroma_client.get_or_create_collection(name="vector_db")
 
-def save_file(path: str, embed_model: str="qwen-embedding"):
+def save_file(path: str, embed_model: str="qwen-embedding:latest"):
     try:
+        file_name = os.path.splitext(
+            os.path.basename(path)
+        )[0]
+
         chunks = qa_chunk_processing(path)
-        print("chunks added")
-        chunks_to_vectors(chunks=chunks)
-        print("embedings added")
+        print("Chunks created")
 
-        ###
-        ### There will be an addition to the db here 
-        ###
-    except:
-        raise Exception
+        vectors = chunks_to_vectors(chunks=chunks, model=embed_model)
+        print("Embeddings created")
 
-def save_dir(path: str, embed_model: str="qwen-embedding"):
-    pass
+        if len(chunks) != len(vectors["embeddings"]):
+            raise ValueError("Chunks and embeddings mismatch")
+
+        run_id = int(time.time())
+        ids = [f"{file_name}_{run_id}_{i}" for i in range(len(chunks))]
+
+        vector_db.add(
+            ids=ids,
+            documents=chunks,
+            embeddings=vectors["embeddings"]
+        )
+        print("Saved to ChromaDB")
+
+
+    except Exception as e:
+        raise e
+
+def save_dir(path: str, embed_model: str="qwen-embedding:latest"):
     
 
+    for root, ders, files in os.walk(path):
+        for file in files:
+            file_path = os.path.join(root, file)
+            
+            try:
+                save_file(file_path, embed_model)
+            except Exception as e:
+                print(f"Failed file {file_path}: {e}")
+    

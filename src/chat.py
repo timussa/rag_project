@@ -1,4 +1,18 @@
 from ollama import chat, ChatResponse, embed
+from src.db import vector_db
+
+def search(query: str, top_k: int = 5, model: str = "qwen-embedding:latest"):
+
+    query_vector = embed(
+        input=query,
+        model=model,
+    )["embeddings"][0]
+
+    return vector_db.query(
+        query_texts=[query_vector],
+        n_results=top_k,
+    )
+    
 
 def start_chat():
 
@@ -17,6 +31,5 @@ def start_chat():
 
 
 
-if __name__ == '__main__':
-    start_chat()
+
 
